@@ -11,50 +11,34 @@ import db, { type ConnectionConfig } from 'mariadb'
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export class MySQL {
-    private connection: db.Connection | null = null
+    private connection: db.Pool | null = null
     private options: ConnectionConfig
     private connected = false
+    private logConnections: boolean
 
-    constructor(options: ConnectionConfig) {
+    constructor(options: ConnectionConfig, logConnections = false) {
         this.options = options
+        this.logConnections = logConnections
     }
 
-    public async connect() {
-        try {
-            const start = Date.now()
-            this.connection = await db.createConnection(this.options)
-            console.log(`[MYSQL] Connected in ${Date.now() - start}ms`)
-            this.initializeHeaders()
-            this.connected = true
-        } catch (_) {
-            console.error('[MYSQL] Error while connecting to database, retrying in 5s')
-            await sleep(5000)
-            await this.reconnect()
+    public connect() {
+        this.connection = db.createPool(this.options)
+        console.log(`[MYSQL] Created MySQL connection pool`)
+        this.connected = true
+
+        if (this.logConnections) {
+            this.connection.on('acquire', (connection) => {
+                console.log(`[MYSQL] Connection ${connection.threadId} acquired`)
+            })
+
+            this.connection.on('release', (connection) => {
+                console.log(`[MYSQL] Connection ${connection.threadId} released`)
+            })
+
+            this.connection.on('enqueue', () => {
+                console.log(`[MYSQL] Waiting for available connection slot`)
+            })
         }
-    }
-
-    private initializeHeaders() {
-        if (this.connection === null) return
-        this.connection.on('end', async () => {
-            console.error('[MYSQL] Connection ended, reconnecting')
-            await this.reconnect()
-        })
-
-        this.connection.on('error', async (err) => {
-            if (this.connection === null) return
-            console.error('[MYSQL] Error: ' + err)
-            if (err.fatal) {
-                console.error('[MYSQL] Fatal error, reconnecting')
-                this.connection.end()
-            }
-        })
-    }
-
-    private async reconnect() {
-        if (this.connection !== null) {
-            this.connection.destroy()
-        }
-        await this.connect()
     }
 
     /**
