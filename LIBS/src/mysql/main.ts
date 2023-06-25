@@ -3,12 +3,10 @@ import db, { type ConnectionConfig } from 'mariadb'
 /**
  * @author patrick115 (Patrik Mintěl)
  * @license MIT
- * @version 1.0.0
+ * @version 1.0.1
  * @description MySQL/MariaDB lib
  * @homepage https://patrick115.eu
  */
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export class MySQL {
     private connection: db.Pool | null = null
