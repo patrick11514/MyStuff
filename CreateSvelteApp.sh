@@ -206,7 +206,7 @@ export const conn = new MySQL({
 	password: DATABASE_PASSWORD
 });
 
-await conn.connect();
+conn.connect();
 EOF
 )
 
