@@ -1,2 +1,2 @@
 # MyStuff
-Rnadom repo with more random things
+Random repo with more random things
