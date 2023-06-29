@@ -83,7 +83,7 @@ export class JWTCookies {
     private key: string
     private compress: boolean
 
-    constructor(key: string, compress: boolean = false) {
+    constructor(key: string, compress = false) {
         this.key = key
         this.compress = compress
     }
