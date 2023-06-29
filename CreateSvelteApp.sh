@@ -257,6 +257,7 @@ select yn in "Yes" "No"; do
         Yes ) 
             mkdir -p src/lib/server
             cp -r ~/LIBS/cookies src/lib/server
+            $COMMAND i async-lz-string
 
             echo "import { JWT_SECRET } from \"\$env/static/private\"" >> src/lib/server/variables.ts
             echo "import { JWTCookies } from './cookies/main';" >> src/lib/server/variables.ts
