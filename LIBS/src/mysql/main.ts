@@ -41,7 +41,7 @@ export class MySQL {
     }
 
     /**
-     *
+     * Query database
      * @param query query string, where you can use %d for database and %t for table
      * @param values array of values to replace ? in query string
      * @param database replace %d if provided as string, if provided as array, it will replace %d0, %d1, %d2, ...
@@ -84,7 +84,7 @@ export class MySQL {
     }
 
     /**
-     *
+     * Select data from database
      * @param query query string, where you can use %d for database and %t for table
      * @param values array of values to replace ? in query string
      * @param database replace %d if provided as string, if provided as array, it will replace %d0, %d1, %d2, ...
@@ -96,7 +96,7 @@ export class MySQL {
     }
 
     /**
-     *
+     * Insert data to database
      * @param query query string, where you can use %d for database and %t for table
      * @param values array of values to replace ? in query string
      * @param database replace %d if provided as string, if provided as array, it will replace %d0, %d1, %d2, ...
@@ -108,7 +108,7 @@ export class MySQL {
     }
 
     /**
-     *
+     * Delete data from database
      * @param query query string, where you can use %d for database and %t for table
      * @param values array of values to replace ? in query string
      * @param database replace %d if provided as string, if provided as array, it will replace %d0, %d1, %d2, ...
@@ -120,7 +120,7 @@ export class MySQL {
     }
 
     /**
-     *
+     * Update data in database
      * @param query query string, where you can use %d for database and %t for table
      * @param values array of values to replace ? in query string
      * @param database replace %d if provided as string, if provided as array, it will replace %d0, %d1, %d2, ...
