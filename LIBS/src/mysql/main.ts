@@ -3,13 +3,14 @@ import db, { type ConnectionConfig } from 'mariadb'
 /**
  * @author patrick115 (Patrik Mintěl)
  * @license MIT
- * @version 1.0.2
+ * @version 1.0.3
  * @description MySQL/MariaDB lib
  * @homepage https://patrick115.eu
  */
 
 export class MySQL {
     private connection: db.Pool | null = null
+    private singleConnection: db.PoolConnection | null = null
     private options: ConnectionConfig
     private connected = false
     private logConnections: boolean
@@ -68,7 +69,14 @@ export class MySQL {
             }
         }
 
-        const data = await this.connection.query(query, values)
+        let connection: db.PoolConnection | db.Pool
+        if (this.singleConnection !== null) {
+            connection = this.singleConnection
+        } else {
+            connection = this.connection
+        }
+
+        const data = await connection.query(query, values)
         if (query.startsWith('SELECT')) {
             return data as T[]
         }
@@ -123,11 +131,73 @@ export class MySQL {
         return this.query<UpdateResponse>(query, values, database, table) as Promise<UpdateResponse>
     }
 
+    /**
+     * Close the connection pool to database
+     */
     async close() {
         if (this.connection === null || !this.connected) return
         this.connection.end()
         this.connected = false
     }
+
+    /**
+     * Aquire connection from pool and start transaction
+     */
+    async start() {
+        if (this.connection === null || !this.connected) return
+        this.singleConnection = await this.connection.getConnection()
+        await this.query('SET autocommit=0;')
+        await this.query('START TRANSACTION;')
+    }
+
+    /**
+     * Release connection from pool
+     */
+    async release() {
+        if (this.connection === null || !this.connected) return
+        if (this.singleConnection === null) return
+        this.singleConnection.release()
+        this.singleConnection = null
+    }
+
+    /**
+     * Commit transaction and release connection from pool
+     */
+    async end() {
+        if (this.connection === null || !this.connected) return
+        await this.query('COMMIT;')
+        await this.query('SET autocommit=1;')
+        await this.release()
+    }
+
+    /**
+     * Rollback transaction and release connection from pool
+     */
+    async rollback() {
+        if (this.connection === null || !this.connected) return
+        await this.query('ROLLBACK;')
+        await this.query('SET autocommit=1;')
+        await this.release()
+    }
+
+    /**
+     * Get connection from pool
+     * @returns returns connection from pool
+     */
+    async getConnection() {
+        if (this.connection === null || !this.connected) return
+        return await this.connection.getConnection()
+    }
+
+    /**
+     * Release connection from pool
+     * @param connection connection from pool
+     */
+    async releaseConnection(connection: db.PoolConnection) {
+        if (this.connection === null || !this.connected) return
+        connection.release()
+    }
+     
 }
 
 export type Data = {
