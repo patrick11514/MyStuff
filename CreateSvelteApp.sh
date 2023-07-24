@@ -1,4 +1,9 @@
 #!/bin/bash
+
+#Author: Patrik Mintěl
+#Website: https://patrick115.eu
+#Version: 1.0.1
+
 FOLDER=$(pwd)
 #if parameter is set
 if [ -n "$1" ]; then
@@ -231,6 +236,58 @@ EOF
 )
             echo "$FUNCTIONS_FILE" > src/lib/functions.ts
     
+            #functions 2
+            FUNCTIONS_FILE2=$(cat <<EOF
+import { json } from '@sveltejs/kit'
+
+export const checkData = async <T>(request: Request, obj: Zod.ZodType<T>): Promise<Response | Zod.infer<typeof obj>> => {
+    let data
+
+    try {
+        data = await request.json()
+    } catch (_) {
+        return json({
+            status: false,
+            error: 'Invalid data'
+        })
+    }
+
+    const resp = obj.safeParse(data)
+
+    if (resp.success) {
+        return resp.data
+    }
+
+    return json({
+        status: false,
+        error: resp.error
+    })
+}
+
+export const isOk = (data: Response | unknown): data is Response => {
+    return data instanceof Response
+}
+EOF
+)
+            echo "$FUNCTIONS_FILE2" > src/lib/server/functions.ts
+
+            # prettier config
+            PRETTIER_CONFIG=$(cat <<EOF
+{
+	"useTabs": false,
+	"tabWidth": 4,
+	"singleQuote": true,
+	"trailingComma": "none",
+	"printWidth": 180,
+	"semi": false,
+	"plugins": ["prettier-plugin-svelte"],
+	"pluginSearchDirs": ["."],
+	"overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
+}
+EOF
+)
+            echo "$PRETTIER_CONFIG" > .prettierrc
+
             break;;
         No ) break;;
     esac
