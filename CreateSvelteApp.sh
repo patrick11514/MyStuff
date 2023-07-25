@@ -11,26 +11,7 @@ if [ -n "$1" ]; then
     FOLDER=$FOLDER/$1
 fi
 
-#check if folder does not exist
-if [ ! -d "$FOLDER" ]; then
-    #create folder
-    mkdir $FOLDER
-else
-    #check if folder is empty
-    if [ "$(ls -A $FOLDER)" ]; then
-        #folder is not empty
-        echo "Folder is not empty"
-        echo "Do you want to continue?"
-        select yn in "Yes" "No"; do
-            case $yn in
-                Yes ) break;;
-                No ) exit;;
-            esac
-        done
-    fi
-fi
-
-echo "Creating Svelte App in $FOLDER"
+cd $FOLDER
 
 #check if pnpm is installed
 if ! command -v pnpm &> /dev/null
@@ -40,27 +21,62 @@ else
     COMMAND="pnpm"
 fi
 
-echo "Using $COMMAND"
 
-cd $FOLDER
-
-#check if svelte is not installed by existing file svelte.config.js
-if [ ! -f "svelte.config.js" ]; then
-    #svelte is not installed
-    echo "Svelte is not installed"
-    echo "Installing"
-    $COMMAND create svelte@latest ./
+#check if .installed file exists
+if [ -f ".installed" ]; then
+    #file exists
+    echo "Svelte App is already installed"
+    echo "Do you want to add new packages?"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) break;;
+            No ) exit;;
+        esac
+    done
+else
+    
+    #check if folder does not exist
+    if [ ! -d "$FOLDER" ]; then
+        #create folder
+        mkdir $FOLDER
+    else
+        #check if folder is empty
+        if [ "$(ls -A $FOLDER)" ]; then
+            #folder is not empty
+            echo "Folder is not empty"
+            echo "Do you want to continue?"
+            select yn in "Yes" "No"; do
+                case $yn in
+                    Yes ) break;;
+                    No ) exit;;
+                esac
+            done
+        fi
+    fi
+    
+    echo "Creating Svelte App in $FOLDER"
+    
+    echo "Using $COMMAND"
+    
+    #check if svelte is not installed by existing file svelte.config.js
+    if [ ! -f "svelte.config.js" ]; then
+        #svelte is not installed
+        echo "Svelte is not installed"
+        echo "Installing"
+        $COMMAND create svelte@latest ./
+    fi
+    
+    #execute command
+    $COMMAND install
+    
 fi
-
-#execute command
-$COMMAND install
 
 #tailwind
 #yes option with more lines
 echo "Do you want to add TailwindCSS?"
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) 
+        Yes )
             $COMMAND install -D tailwindcss postcss autoprefixer
             npx tailwindcss init -p
             CONFIGFILE=$(cat <<EOF
@@ -73,17 +89,17 @@ export default {
   plugins: []
 };
 EOF
-)
-            echo "$CONFIGFILE" > tailwind.config.js
-
+            )
+                echo "$CONFIGFILE" > tailwind.config.js
+                
             CSSFILE=$(cat <<EOF
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 EOF
-)
-            echo "$CSSFILE" > src/app.css
-
+                )
+                    echo "$CSSFILE" > src/app.css
+                    
             LAYOUT=$(cat <<EOF
 <script>
   import "../app.css";
@@ -91,9 +107,9 @@ EOF
 
 <slot />
 EOF
-)
-            echo "$LAYOUT" > src/routes/+layout.svelte
-
+                    )
+                        echo "$LAYOUT" > src/routes/+layout.svelte
+                        
             MAIN_FILE=$(cat <<EOF
 <h1>Welcome to SvelteKit</h1>
 <p>
@@ -101,10 +117,10 @@ EOF
     <span class="text-red-500">text-red-500</span>
 </p>
 EOF
-)
-            echo "$MAIN_FILE" > src/routes/+page.svelte
-            break;;
-        No ) break;;
+                        )
+                            echo "$MAIN_FILE" > src/routes/+page.svelte
+                        break;;
+                        No ) break;;
     esac
 done
 
@@ -113,10 +129,10 @@ echo "Do you want to install default packages?"
 
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) 
+        Yes )
             $COMMAND i dotenv mariadb fs bcrypt uuid jsonwebtoken zod sweetalert2 path simple-json-db
             $COMMAND i -D @sveltejs/adapter-node @types/bcrypt @types/uuid @types/jsonwebtoken
-
+            
             #add scripts
             SVELTECONFIG=$(cat <<EOF
 import adapter from '@sveltejs/adapter-node'
@@ -142,10 +158,10 @@ const config = {
 
 export default config
 EOF
-)
-            echo "$SVELTECONFIG" > svelte.config.js
-
-            #add .env
+            )
+                echo "$SVELTECONFIG" > svelte.config.js
+                
+                #add .env
             ENV=$(cat <<EOF
 #webserver config
 HOST=0.0.0.0
@@ -164,10 +180,10 @@ COOKIE_EXPIRE=1200
 #v sekundách (5 minut = 5 * 60)
 PUBLIC_CHECK_COOKIE_INTERVAL=300
 EOF
-)
-            echo "$ENV" > .env
-
-            #README
+                )
+                    echo "$ENV" > .env
+                    
+                    #README
             README=$(cat <<EOF
  # Info
 ...
@@ -199,12 +215,12 @@ Spuštění buildnuté aplikace \`npm run start\` s [Node Adaptérem](https://ki
 $ENV
 \`\`\`
 EOF
-)
-            echo "$README" > README.md
-
-            mkdir -p src/lib/server
-
-            #variables
+                    )
+                        echo "$README" > README.md
+                        
+                        mkdir -p src/lib/server
+                        
+                        #variables
             VARIABLES_FILE=$(cat <<EOF
 import {
 	DATABASE_IP,
@@ -223,20 +239,20 @@ export const conn = new MySQL({
 
 conn.connect();
 EOF
-)
-
-            echo "$VARIABLES_FILE" > src/lib/server/variables.ts
-
-            #functions
+                        )
+                            
+                            echo "$VARIABLES_FILE" > src/lib/server/variables.ts
+                            
+                            #functions
             FUNCTIONS_FILE=$(cat <<EOF
 export const sleep = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 EOF
-)
-            echo "$FUNCTIONS_FILE" > src/lib/functions.ts
-    
-            #functions 2
+                            )
+                                echo "$FUNCTIONS_FILE" > src/lib/functions.ts
+                                
+                                #functions 2
             FUNCTIONS_FILE2=$(cat <<EOF
 import { json } from '@sveltejs/kit'
 
@@ -268,10 +284,10 @@ export const isOk = (data: Response | unknown): data is Response => {
     return data instanceof Response
 }
 EOF
-)
-            echo "$FUNCTIONS_FILE2" > src/lib/server/functions.ts
-
-            # prettier config
+                                )
+                                    echo "$FUNCTIONS_FILE2" > src/lib/server/functions.ts
+                                    
+                                    # prettier config
             PRETTIER_CONFIG=$(cat <<EOF
 {
 	"useTabs": false,
@@ -285,11 +301,11 @@ EOF
 	"overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
 }
 EOF
-)
-            echo "$PRETTIER_CONFIG" > .prettierrc
-
-            break;;
-        No ) break;;
+                                    )
+                                        echo "$PRETTIER_CONFIG" > .prettierrc
+                                        
+                                    break;;
+                                    No ) break;;
     esac
 done
 
@@ -298,10 +314,10 @@ echo "Do you want to install authme lib?"
 
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) 
+        Yes )
             mkdir -p src/lib/server
             cp -r ~/LIBS/authme src/lib/server
-            break;;
+        break;;
         No ) break;;
     esac
 done
@@ -311,15 +327,15 @@ echo "Do you want to install cookies lib?"
 
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) 
+        Yes )
             mkdir -p src/lib/server
             cp -r ~/LIBS/cookies src/lib/server
             $COMMAND i async-lz-string
-
+            
             echo "import { JWT_SECRET } from \"\$env/static/private\"" >> src/lib/server/variables.ts
             echo "import { JWTCookies } from './cookies/main';" >> src/lib/server/variables.ts
             echo "export const jwt = new JWTCookies(JWT_SECRET)" >> src/lib/server/variables.ts
-            break;;
+        break;;
         No ) break;;
     esac
 done
@@ -329,10 +345,10 @@ echo "Do you want to install mysql lib?"
 
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) 
+        Yes )
             mkdir -p src/lib/server
             cp -r ~/LIBS/mysql src/lib/server
-            break;;
+        break;;
         No ) break;;
     esac
 done
@@ -342,13 +358,14 @@ echo "Do you want to initialize git?"
 
 select yn in "Yes" "No"; do
     case $yn in
-        Yes ) 
+        Yes )
             git init
             git add .
             git commit -m "Initial commit"
-            break;;
+        break;;
         No ) break;;
     esac
 done
 
+touch .installed
 echo "Installation finished"
