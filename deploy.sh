@@ -1,5 +1,5 @@
 #!/bin/bash
-cp ./init* ~
-cp CreateSvelteApp.sh ~
+cp ./init* ~/scripts
+cp CreateSvelteApp.sh ~/scripts
 cd LIBS
 pnpm depl
