@@ -25,7 +25,6 @@ fi
 if [ ! -d "$FOLDER" ]; then
     #create folder
     mkdir $FOLDER
-    cd $FOLDER
 else
     #check if folder is empty
     if [ "$(ls -A $FOLDER)" ]; then
@@ -41,6 +40,7 @@ else
     fi
 fi
 
+cd $FOLDER
 
 #check if .installed file exists
 if [ -f ".installed" ]; then
