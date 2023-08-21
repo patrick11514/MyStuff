@@ -5,13 +5,13 @@
 #Version: 1.0.1
 
 FOLDER=$(pwd)
+
+cd $FOLDER
 #if parameter is set
 if [ -n "$1" ]; then
     #pwd + parameter
     FOLDER=$FOLDER/$1
 fi
-
-cd $FOLDER
 
 #check if pnpm is installed
 if ! command -v pnpm &> /dev/null
@@ -19,6 +19,26 @@ then
     COMMAND="npm"
 else
     COMMAND="pnpm"
+fi
+
+#check if folder does not exist
+if [ ! -d "$FOLDER" ]; then
+    #create folder
+    mkdir $FOLDER
+    cd $FOLDER
+else
+    #check if folder is empty
+    if [ "$(ls -A $FOLDER)" ]; then
+        #folder is not empty
+        echo "Folder is not empty"
+        echo "Do you want to continue?"
+        select yn in "Yes" "No"; do
+            case $yn in
+                Yes ) break;;
+                No ) exit;;
+            esac
+        done
+    fi
 fi
 
 
@@ -34,26 +54,6 @@ if [ -f ".installed" ]; then
         esac
     done
 else
-    
-    #check if folder does not exist
-    if [ ! -d "$FOLDER" ]; then
-        #create folder
-        mkdir $FOLDER
-    else
-        #check if folder is empty
-        if [ "$(ls -A $FOLDER)" ]; then
-            #folder is not empty
-            echo "Folder is not empty"
-            echo "Do you want to continue?"
-            select yn in "Yes" "No"; do
-                case $yn in
-                    Yes ) break;;
-                    No ) exit;;
-                esac
-            done
-        fi
-    fi
-    
     echo "Creating Svelte App in $FOLDER"
     
     echo "Using $COMMAND"
