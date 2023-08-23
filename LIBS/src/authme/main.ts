@@ -4,7 +4,7 @@ import crypto from 'crypto'
 /**
  * @author patrick115 (Patrik Mintěl)
  * @license MIT
- * @version 1.0.0
+ * @version 1.0.1
  * @description Authme lib
  * @homepage https://patrick115.eu
  */
@@ -35,13 +35,13 @@ export class Authme {
     //$SHA$SALT$SHA256(SALT + SHA256(PASS))
 
     private comparePasswordSHA256(password: string, hash: string): boolean {
-        let split = hash.split('$')
-        let salt = split[2]
-        let passHash = split[3]
+        const split = hash.split('$')
+        const salt = split[2]
+        const passHash = split[3]
 
-        let hashedPassword = crypto.createHash('SHA256').update(password).digest('hex')
-        let saltPass = hashedPassword + salt
-        let saltPassHash = crypto.createHash('SHA256').update(saltPass).digest('hex')
+        const hashedPassword = crypto.createHash('SHA256').update(password).digest('hex')
+        const saltPass = hashedPassword + salt
+        const saltPassHash = crypto.createHash('SHA256').update(saltPass).digest('hex')
 
         if (saltPassHash == passHash) {
             return true
