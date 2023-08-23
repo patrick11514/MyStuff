@@ -384,6 +384,9 @@ select yn in "Yes" "No"; do
             git init
             git add .
             git commit -m "Initial commit"
+            
+            #add files to gitignore
+            echo "pnpm-lock.yaml" >> .gitignore
         break;;
         No ) break;;
     esac
