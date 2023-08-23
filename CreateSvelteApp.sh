@@ -42,6 +42,8 @@ fi
 
 cd $FOLDER
 
+INSTALLED=false
+
 #check if .installed file exists
 if [ -f ".installed" ]; then
     #file exists
@@ -53,6 +55,7 @@ if [ -f ".installed" ]; then
             No ) exit;;
         esac
     done
+    INSTALLED=true
 else
     echo "Creating Svelte App in $FOLDER"
     
@@ -220,43 +223,21 @@ EOF
                         
                         mkdir -p src/lib/server
                         
-                        #variables
-            VARIABLES_FILE=$(cat <<EOF
-import {
-	DATABASE_IP,
-	DATABASE_PASSWORD,
-	DATABASE_PORT,
-	DATABASE_USER
-} from '\$env/static/private';
-import { MySQL } from './mysql/main';
-
-export const conn = new MySQL({
-	host: DATABASE_IP,
-	port: parseInt(DATABASE_PORT),
-	user: DATABASE_USER,
-	password: DATABASE_PASSWORD
-});
-
-conn.connect();
-EOF
-                        )
-                            
-                            echo "$VARIABLES_FILE" > src/lib/server/variables.ts
-                            
-                            #functions
+                        #functions
             FUNCTIONS_FILE=$(cat <<EOF
 export const sleep = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 EOF
-                            )
-                                echo "$FUNCTIONS_FILE" > src/lib/functions.ts
-                                
-                                #functions 2
+                        )
+                            echo "$FUNCTIONS_FILE" > src/lib/functions.ts
+                            
+                            #functions 2
             FUNCTIONS_FILE2=$(cat <<EOF
 import { json } from '@sveltejs/kit'
+import z from 'zod'
 
-export const checkData = async <T>(request: Request, obj: Zod.ZodType<T>): Promise<Response | Zod.infer<typeof obj>> => {
+export const checkData = async <T>(request: Request, obj: z.ZodType<T>): Promise<Response | z.infer<typeof obj>> => {
     let data
 
     try {
@@ -284,10 +265,12 @@ export const isOk = (data: Response | unknown): data is Response => {
     return data instanceof Response
 }
 EOF
-                                )
-                                    echo "$FUNCTIONS_FILE2" > src/lib/server/functions.ts
-                                    
-                                    # prettier config
+                            )
+                                echo "$FUNCTIONS_FILE2" > src/lib/server/functions.ts
+                                
+                                # prettier config
+                                #check if tailwind.config.js file exists
+                                if [ ! -f "tailwind.config.js" ]; then
             PRETTIER_CONFIG=$(cat <<EOF
 {
 	"useTabs": false,
@@ -297,11 +280,26 @@ EOF
 	"printWidth": 180,
 	"semi": false,
 	"plugins": ["prettier-plugin-svelte"],
-	"pluginSearchDirs": ["."],
 	"overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
 }
 EOF
                                     )
+                                    else
+                                        
+            PRETTIER_CONFIG=$(cat <<EOF
+{
+	"useTabs": false,
+	"tabWidth": 4,
+	"singleQuote": true,
+	"trailingComma": "none",
+	"printWidth": 180,
+	"semi": false,
+	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+	"overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
+}
+EOF
+                                        )
+                                        fi
                                         echo "$PRETTIER_CONFIG" > .prettierrc
                                         
                                     break;;
@@ -348,8 +346,32 @@ select yn in "Yes" "No"; do
         Yes )
             mkdir -p src/lib/server
             cp -r ~/LIBS/mysql src/lib/server
-        break;;
-        No ) break;;
+            
+            #variables
+            
+            VARIABLES_FILE=$(cat <<EOF
+import {
+	DATABASE_IP,
+	DATABASE_PASSWORD,
+	DATABASE_PORT,
+	DATABASE_USER
+} from '\$env/static/private';
+import { MySQL } from './mysql/main';
+
+export const conn = new MySQL({
+	host: DATABASE_IP,
+	port: parseInt(DATABASE_PORT),
+	user: DATABASE_USER,
+	password: DATABASE_PASSWORD
+});
+
+conn.connect();
+EOF
+            )
+                
+                echo "$VARIABLES_FILE" >> src/lib/server/variables.ts
+            break;;
+            No ) break;;
     esac
 done
 
@@ -366,6 +388,11 @@ select yn in "Yes" "No"; do
         No ) break;;
     esac
 done
+
+#check if installed
+if [ "$INSTALLED" = true ] ; then
+    $COMMAND update -L
+fi
 
 touch .installed
 echo "Installation finished"
