@@ -144,7 +144,7 @@ echo "Do you want to install default packages?"
 select yn in "Yes" "No"; do
     case $yn in
         Yes )
-            $COMMAND i dotenv mariadb fs bcrypt uuid jsonwebtoken zod sweetalert2 path simple-json-db
+            $COMMAND i dotenv mariadb bcrypt uuid jsonwebtoken zod sweetalert2 path simple-json-db
             $COMMAND i -D @sveltejs/adapter-node @types/bcrypt @types/uuid @types/jsonwebtoken
             
             #add scripts
