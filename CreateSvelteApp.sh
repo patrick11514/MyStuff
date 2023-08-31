@@ -72,6 +72,17 @@ else
     #execute command
     $COMMAND install
     
+    #remove example file
+    rm src/lib/index.ts
+    
+    #add files to gitignore
+    echo "#installer file" >> .gitignore
+    echo ".installed" >> .gitignore
+    echo "#lock files" >> .gitignore
+    echo "pnpm-lock.yaml" >> .gitignore
+    echo "package-lock.json" >> .gitignore
+    echo "yarn.lock" >> .gitignore
+    
 fi
 
 #tailwind
@@ -384,9 +395,6 @@ select yn in "Yes" "No"; do
             git init
             git add .
             git commit -m "Initial commit"
-            
-            #add files to gitignore
-            echo "pnpm-lock.yaml" >> .gitignore
         break;;
         No ) break;;
     esac
