@@ -54,7 +54,7 @@ let packageProgram: 'npm' | 'pnpm' | 'yarn' = 'npm'
 const main = async () => {
     _(
         'text',
-        `Welcome in ${clc.redBright('Create Patrick115 App')} version ${clc.yellow(process.env.npm_package_version)}`,
+        `Welcome in ${clc.redBright('Create Patrick115 App')} version ${clc.yellow(process.env.npm_package_version)}`
     )
 
     let currentPath = process.env.PWD as string
@@ -180,7 +180,7 @@ const _p = (
               name: string
               version?: string
               dev?: true
-          }[],
+          }[]
 ): string => {
     let string = packageProgram
     if (packageProgram == 'yarn') {
@@ -391,7 +391,7 @@ yarn.lock`
     "semi": false,
     "plugins": ["prettier-plugin-svelte"${tools.includes('tailwindcss') ? ', "prettier-plugin-tailwindcss"' : ''}],
     "overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
-}`,
+}`
         )
     }
 
@@ -416,7 +416,7 @@ export default {
     extend: {}
   },
   plugins: []
-};`,
+};`
         )
         //postcss config
         fs.writeFileSync(
@@ -427,7 +427,7 @@ export default {
         autoprefixer: {},
     },
 }
-`,
+`
         )
 
         //css file
@@ -435,7 +435,7 @@ export default {
             Path.join(path, 'src', 'app.css'),
             `@tailwind base;
 @tailwind components;
-@tailwind utilities;`,
+@tailwind utilities;`
         )
 
         //layout
@@ -445,7 +445,7 @@ export default {
     import "../app.css";
 </script>
 
-<slot />`,
+<slot />`
         )
 
         //main wile with example TailwindCSS Class
@@ -455,7 +455,7 @@ export default {
 <p>
     Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation
     <span class="text-red-500">text-red-500</span>
-</p>`,
+</p>`
         )
     }
 
@@ -492,7 +492,7 @@ PUBLIC_CHECK_COOKIE_INTERVAL=300`
             Path.join(path, 'src', 'lib', 'functions.ts'),
             `export const sleep = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms))
-}`,
+}`
         )
 
         //server functions
@@ -527,7 +527,7 @@ export const checkData = async <T>(request: Request, obj: z.ZodType<T>): Promise
 
 export const isOk = (data: Response | unknown): data is Response => {
     return data instanceof Response
-}`,
+}`
         )
     }
 
@@ -537,7 +537,7 @@ export const isOk = (data: Response | unknown): data is Response => {
         devPackages.push('@types/bcrypt')
 
         const request = await fetch(
-            'https://raw.githubusercontent.com/patrick11514/MyStuff/main/LIBS/src/authme/main.ts',
+            'https://raw.githubusercontent.com/patrick11514/MyStuff/main/LIBS/src/authme/main.ts'
         )
         const data = await request.text()
         const serverPath = Path.join(path, 'src', 'lib', 'server')
@@ -553,7 +553,7 @@ export const isOk = (data: Response | unknown): data is Response => {
         devPackages = devPackages.concat(['@types/uuid', '@types/jsonwebtoken'])
 
         const request = await fetch(
-            'https://raw.githubusercontent.com/patrick11514/MyStuff/main/LIBS/src/cookies/main.ts',
+            'https://raw.githubusercontent.com/patrick11514/MyStuff/main/LIBS/src/cookies/main.ts'
         )
         const data = await request.text()
         const serverPath = Path.join(path, 'src', 'lib', 'server')
@@ -566,7 +566,7 @@ export const isOk = (data: Response | unknown): data is Response => {
             Path.join(serverPath, 'variables.ts'),
             `import { JWT_SECRET} from '$env/static/private'
 import { JWTCookies } from './cookies/main'
-export const jwt = new JWTCookies(JWT_SECRET)\n`,
+export const jwt = new JWTCookies(JWT_SECRET)\n`
         )
     }
 
@@ -575,7 +575,7 @@ export const jwt = new JWTCookies(JWT_SECRET)\n`,
         packages.push('mariadb')
 
         const request = await fetch(
-            'https://raw.githubusercontent.com/patrick11514/MyStuff/main/LIBS/src/mysql/main.ts',
+            'https://raw.githubusercontent.com/patrick11514/MyStuff/main/LIBS/src/mysql/main.ts'
         )
         const data = await request.text()
         const serverPath = Path.join(path, 'src', 'lib', 'server')
@@ -601,7 +601,7 @@ export const conn = new MySQL({
     password: DATABASE_PASSWORD
 });
 
-conn.connect();\n`,
+conn.connect();\n`
         )
     }
 
@@ -724,7 +724,7 @@ ${
 
 \`\`\`YAML
 ${fs.readFileSync(Path.join(path, '.env.example'))}
-\`\`\``,
+\`\`\``
     )
 
     _('text', 'Installing packages...')
@@ -740,7 +740,7 @@ ${fs.readFileSync(Path.join(path, '.env.example'))}
                     name: p,
                     dev: true,
                 }
-            }),
+            })
         )
 
     //remove default adapter
@@ -750,7 +750,7 @@ ${fs.readFileSync(Path.join(path, '.env.example'))}
     const svelteJS = fs.readFileSync(Path.join(path, 'svelte.config.js'))
     fs.writeFileSync(
         Path.join(path, 'svelte.config.js'),
-        svelteJS.toString().replace(/@sveltejs\/adapter-auto/g, `@sveltejs/adapter-${adapter}`),
+        svelteJS.toString().replace(/@sveltejs\/adapter-auto/g, `@sveltejs/adapter-${adapter}`)
     )
 
     await _c(_p(arr), path)
