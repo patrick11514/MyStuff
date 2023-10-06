@@ -7,25 +7,21 @@
         "dev": "ts-node-dev --respawn ./src/index.ts",
         "build": "mkdir -p build && tsc -p tsconfig.json ",
         "start": "node ./build/index.js",
-        "clear": "rm -r build"
+        "clear": "rm -r build",
+        "depl": "pnpm run build && node ./deploy.js && cp build/* ~/scripts && cp CreateSvelteApp ~/scripts && cd ~/scripts && pnpm i && chmod +x CreateSvelteApp"
     },
     "keywords": [],
     "author": "Patrik Mintěl",
     "license": "ISC",
     "dependencies": {
         "cli-color": "^2.0.3",
-        "dotenv": "^16.3.1",
         "enquirer": "^2.4.1",
-        "mariadb": "^3.2.1",
-        "node-fetch": "^3.3.2",
-        "prettier": "^3.0.3",
-        "strip-color": "^0.1.0"
+        "node-fetch": "^3.3.2"
     },
     "devDependencies": {
         "@types/cli-color": "^2.0.3",
         "@types/inquirer": "^9.0.3",
         "@types/node": "^20.8.2",
-        "@types/strip-color": "^0.1.0",
         "ts-node-dev": "^2.0.0",
         "typescript": "^5.2.2"
     }
