@@ -670,7 +670,7 @@ conn.connect();\n`
                 hint: 'for Netlify',
             },
             {
-                message: ' Node',
+                message: 'Node',
                 name: 'node',
                 hint: 'for Node servers',
             },
