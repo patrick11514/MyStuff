@@ -1,3 +1,6 @@
 [submodule "LIBS/Endpoints"]
 	path = LIBS/Endpoints
 	url = git@github.com:patrick11514/Endpoints.git
+[submodule "CreateApp"]
+	path = CreateApp
+	url = git@github.com:patrick11514/CreateApp.git
