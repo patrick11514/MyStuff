@@ -1,0 +1,3 @@
+[submodule "LIBS/Endpoints"]
+	path = LIBS/Endpoints
+	url = git@github.com:patrick11514/Endpoints.git
