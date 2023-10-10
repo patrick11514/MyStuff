@@ -1,19 +1,21 @@
 import dotenv from 'dotenv'
-import { MySQL } from './mysql/main'
+import { z } from 'zod'
+import { Endpoint } from './endpoint/main'
 dotenv.config()
 ;(async () => {
-    const conn = new MySQL(
+    const endpoint = new Endpoint(
+        'http://localhost:5173/api/login',
+        'POST',
         {
-            host: process.env.DATABASE_IP,
-            port: parseInt(process.env.DATABASE_PORT as string),
-            user: process.env.DATABASE_USER,
-            password: process.env.DATABASE_PASSWORD,
-            database: process.env.DATABASE_DATABASE,
+            username: 'patrick115',
+            password: 'pepa123',
         },
-        true
+        z.object({
+            success: z.literal(true),
+            data: z.object({}),
+        })
     )
 
-    conn.connect()
-
-    const table = process.env.DATABASE_TABLE
+    const data = await endpoint.fetch()
+    console.log(data)
 })()
